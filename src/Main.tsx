@@ -1,20 +1,20 @@
-import React from 'react';
+import * as React from "react"
 import { observer } from 'mobx-react-lite'
-import logo from "./logo.svg";
+import { Link } from "react-router-dom"
+import { Router, Outlet } from "react-router-dom"
+import { RouteWrapper } from "./RouteWrapper"
 import { router } from "./router";
-import './App.css';
 
-router.appendPathList('/user/:name')
-
-export const App = observer(() => {
+export const Main: React.FC = observer(() => {
   const { location, push, back, query, hashValue, pathValue } = router
-  return (
-    <div className="App">
+  let [state, setState] = React.useState({
+    action: router.history.action,
+    location: router.history.location,
+  }); 
+  React.useLayoutEffect(() => router.subscribe(setState), []);
+  return <Router location={state.location} navigationType={state.action} navigator={router.history}>
+    <main>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
         <p>Current pathname: {location.pathname}</p>
         <p>Current query: {JSON.stringify(query)}</p>
         <p>Current hash: {hashValue}</p>
@@ -25,8 +25,17 @@ export const App = observer(() => {
           <button onClick={() => push('#xyz')}>go to hash "#xyz"</button>
           <button onClick={() => push('/user/dan')}>go to path "/user/dan"</button>
           <button onClick={back}>Back</button>
+
+          <div>
+            <p>React Router 6 example</p>
+            <Link to="/pagea">go to Page A</Link>
+            <br /><br />
+            <Link to="/pageb">go to Page B</Link>
+          </div>
         </p>
       </header>
-    </div>
-  );
+      <RouteWrapper />
+      <Outlet />
+    </main>
+  </Router>
 })
